@@ -13,7 +13,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 const SignIn = ({ navigation }) => {
     const fadeAnim = useRef(new Animated.Value(1)).current;  // 초기 너비
     const colorAnim = useRef(new Animated.Value(0)).current; // 초기 색상
-
+    function navigate(){
+        navigation.navigate("signUp")
+    }
     useEffect(() => {
         Animated.parallel([
             Animated.timing(fadeAnim, {
@@ -75,8 +77,13 @@ const SignIn = ({ navigation }) => {
                         <Text style={styles.ButtonText}>로그인</Text>
                     </TouchableOpacity>
                 </View>
-                <Text>
-                </Text>
+                <TouchableOpacity 
+                style={styles.TextButton}
+                onPress={navigate}>
+                    <Text style={styles.SignUpText}>
+                        회원 가입
+                    </Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -143,7 +150,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingLeft: 5,
         marginTop: 20,
-        marginLeft: 30,
+        marginLeft: 15,
         color:'#fff'
     },
     Button : {
@@ -156,11 +163,21 @@ const styles = StyleSheet.create({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: 30
+        marginLeft: 15
     },
     ButtonText: {
         fontWeight: 'bold',
         fontSize: 18
+    },
+    SignUpText:{
+        color:'gray',
+    },
+    TextButton: {
+        width: '100%',
+        display: 'flex',
+        alignItems:'center',
+        justifyContent: 'center',
+        marginTop: 20
     }
 });
 
