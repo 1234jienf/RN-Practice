@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { 
     Text, 
     View,
@@ -11,12 +11,54 @@ import {
     from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import BackIcon from "react-native-vector-icons/Feather";
-import Icon from "react-native-vector-icons/Feather";
+import { auth } from "../Firebase/firebase"; // Import auth instance
+import { createUserWithEmailAndPassword } from "firebase/auth"; // Ensure this is imported
+import { Button, Overlay } from "react-native-elements";
+import FormError from "../Components/FormError";
+import FormSuccess from "../Components/FormSuccess";
 
 const SignUp = ({navigation}) => {
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [errorMessage, setErrorMessage]=useState('');
+    const [mobile, setMobile] = useState();
+    const [password, setPassword] = useState();
+    const [confirmPassword, setConfirmPassword] = useState();
+    const [displayFormErr, setDisplayFormErr] = useState(false);
+
+    function fullNameChange(value) {
+        setFullName(value)
+    }
     function navigate(){
         navigation.navigate("signIn")
     }
+    function createUser() {
+        auth.auth().createUserWithEmailAndPassword(email,password)
+        .then(()=>{
+
+        })
+        .catch((err)=>{
+            setErrorMessage(err.message)
+            setDisplayFormErr(true);
+        })
+    }
+
+    const validateForm = () =>{
+        var form_input = [fullName, email, mobile, password, confirmPassword];
+        var passwords_match = password == confirmPassword;
+    
+        if(form_input.includes('') || form_input.includes(undefined)){
+            setErrorMessage("Please Fill in all fields");
+            return setDisplayFormErr(true);
+        }
+        if(!passwords_match){
+            setErrorMessage("Passwords do not match");
+            return setDisplayFormErr(true);
+        }
+        if(passwords_match) 
+        return createUser();
+    }
+
     return(
         <View style={styles.mainView}>
             <LinearGradient
@@ -45,33 +87,49 @@ const SignUp = ({navigation}) => {
                     Account
                 </Text>
                 <View style={styles.FormView}>
-                    <TextInput 
+                    <TextInput
+                    onChangeText={fullNameChange}
+                    value={fullName}
                     placeholder={"Full Name"}
                     placeholderTextColor={"#fff"}
                     style={styles.TextInput}/>
                     <TextInput 
+                    onChangeText={(val)=>setEmail(val)}
                     placeholder={"Email Address"}
                     placeholderTextColor={"#fff"}
                     style={styles.TextInput}/>
-                    <TextInput 
+                    <TextInput
+                    onChangeText={(val)=>setMobile(val)}
                     placeholder={"Mobile"}
                     placeholderTextColor={"#fff"}
                     style={styles.TextInput}/>
-                    <TextInput 
+                    <TextInput
+                    onChangeText={(val)=>setPassword(val)}
                     placeholder={"Password"}
                     secureTextEntry={true}
                     placeholderTextColor={"#fff"}
                     style={styles.TextInput}/>
-                    <TextInput 
+                    <TextInput
+                    onChangeText={(val)=>setConfirmPassword(val)}
                     placeholder={"Confirm Password"}
                     secureTextEntry={true}
                     placeholderTextColor={"#fff"}
                     style={styles.TextInput}/>
-                    <TouchableOpacity style={styles.Button}>
+                    <TouchableOpacity 
+                    onPress={validateForm}
+                    style={styles.Button}>
                         <Text style={styles.ButtonText}>회원 가입</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
+            {displayFormErr == true?
+            <FormError 
+            hideErrOverlay={setDisplayFormErr}
+            err={errorMessage}
+            />
+            :
+            null
+            }
         </View>
     )
 }
