@@ -6,7 +6,7 @@ import {
     Animated, 
     TextInput,
     TouchableOpacity, 
-    ScrollView
+    ScrollView,
     } 
     from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -20,6 +20,8 @@ import FormSuccess from "../Components/FormSuccess";
 const SignUp = ({navigation}) => {
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage]=useState('');
     const [mobile, setMobile] = useState();
     const [password, setPassword] = useState();
@@ -33,11 +35,14 @@ const SignUp = ({navigation}) => {
         navigation.navigate("signIn")
     }
     function createUser() {
-        auth.auth().createUserWithEmailAndPassword(email,password)
+        setIsLoading(true);
+        createUserWithEmailAndPassword(auth, email, password)
         .then(()=>{
-
+            setIsLoading(false);
+            setSuccessMessage("Your account has been created");
         })
         .catch((err)=>{
+            setIsLoading(false)
             setErrorMessage(err.message)
             setDisplayFormErr(true);
         })
@@ -129,6 +134,16 @@ const SignUp = ({navigation}) => {
             />
             :
             null
+            }
+            {isLoading == true?
+                <FormSuccess/>
+                :
+                successMessage == "Your account has been created"?
+                    <FormSuccess 
+                    successMessage={successMessage}
+                    close={setSuccessMessage}/>
+                :
+                null
             }
         </View>
     )

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { 
     Text, 
     View,
@@ -9,8 +9,17 @@ import {
     } 
     from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import FormError from '../Components/FormError';
+import { auth } from '../Firebase/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import FormSuccess from '../Components/FormSuccess';
 
 const SignIn = ({ navigation }) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('')
+    const [displayFormErr, setDisplayFormErr] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const fadeAnim = useRef(new Animated.Value(1)).current;  // 초기 너비
     const colorAnim = useRef(new Animated.Value(0)).current; // 초기 색상
     function navigate(){
@@ -41,6 +50,28 @@ const SignIn = ({ navigation }) => {
         outputRange: ['blue', 'white'] // 색상이 파란색에서 흰색으로 변함
     });
 
+    const validateInput = () => {
+        var form_input = [email,password];
+        
+        if(form_input.includes('') || form_input.includes(undefined)){
+            setErrorMessage('Please Fill in all fields')
+            return setDisplayFormErr(true);
+        }
+        setIsLoading(true)
+        signInWithEmailAndPassword(auth,email,password)
+        .then(()=>{
+            setIsLoading(false)
+            console.log('로그인 됨')
+
+        })
+        .catch(err =>{
+            console.log(err)
+            setErrorMessage(err.message)
+            setIsLoading(false)
+            return setDisplayFormErr(true);
+        
+        })
+    }
     return (
         <View style={styles.mainView}>
             <LinearGradient
@@ -64,17 +95,20 @@ const SignIn = ({ navigation }) => {
                     Back
                 </Text>
                 <View style={styles.FormView}>
-                    <TextInput 
+                    <TextInput
+                    value={email} onChangeText={(val => setEmail(val))}
                     placeholder={"Email Address"}
                     placeholderTextColor={"#fff"}
                     style={styles.TextInput}/>
                     <TextInput 
+                    value={password} onChangeText={(val => setPassword(val))}
                     placeholder={"Password"}
                     secureTextEntry={true}
                     placeholderTextColor={"#fff"}
                     style={styles.TextInput}/>
                     <TouchableOpacity style={styles.Button}>
-                        <Text style={styles.ButtonText}>로그인</Text>
+                        <Text style={styles.ButtonText}
+                        onPress={validateInput}>로그인</Text>
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity 
@@ -85,6 +119,20 @@ const SignIn = ({ navigation }) => {
                     </Text>
                 </TouchableOpacity>
             </View>
+            {displayFormErr == true?
+            <FormError 
+            hideErrOverlay={setDisplayFormErr}
+            err={errorMessage}
+            />
+            :
+            null
+            }
+            {isLoading == true?
+            <FormSuccess/>
+            :
+            null
+
+            }
         </View>
     );
 }

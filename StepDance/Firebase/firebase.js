@@ -1,7 +1,8 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 
-const firebaseConfig = {
+
+var firebaseConfig = {
     apiKey: "AIzaSyCfUYVGnu04RqChmLcvujV11k_HgGiQp1E",
     authDomain: "stepdance-336e7.firebaseapp.com",
     projectId: "stepdance-336e7",
@@ -12,6 +13,6 @@ const firebaseConfig = {
 }
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);  // Create an auth instance
+const auth = getAuth(app);
 
-export { auth }; // Export for use in your components
+export { auth, app };
