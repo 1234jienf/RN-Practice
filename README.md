@@ -11,3 +11,19 @@
   - 회원가입 폼 구현
     - error 발생시, 라이브러리를 이용하여 display 가능하게 함
 
+### 240417
+
+- 로그인 후 , Home 화면 입장
+- 네 개 탭 구성
+  - Home
+  - Apparel
+  - Notification
+  - Profile
+- Youtube API 연결 후, 영상 검색 가능
+
+### 240418 
+
+- Home UI 변경
+- Profile UI 변경
+- React-Native - Three 연결 실패
+  - 어떻게 연결할지 조금 더 디버깅 해봐야함
