@@ -7,4 +7,5 @@ const Apparel = () => {
     )
 }
 
+
 export default Apparel;

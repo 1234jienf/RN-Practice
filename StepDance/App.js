@@ -62,10 +62,10 @@ export default function App() {
               tabBarInactiveTintColor: '#7A8FA6',
             })}
           >
-            <Tab.Screen name='Home' component={Home} />
-            <Tab.Screen name='Apparel' component={Apparel} />
-            <Tab.Screen name='Notification' component={Notification} />
-            <Tab.Screen name='Profile' component={Profile} />
+            <Tab.Screen name='Home' component={Home} options={{ headerShown: false }} />
+            <Tab.Screen name='Apparel' component={Apparel} options={{ headerShown: false }} />
+            <Tab.Screen name='Notification' component={Notification} options={{ headerShown: false }} />
+            <Tab.Screen name='Profile' component={Profile} options={{ headerShown: false }} />
           </Tab.Navigator>
         </NavigationContainer>
       )

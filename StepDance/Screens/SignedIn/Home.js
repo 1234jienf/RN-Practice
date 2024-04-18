@@ -1,109 +1,139 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, FlatList, StyleSheet, TouchableOpacity, TextInput, Image } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { Text, View, FlatList, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView } from "react-native";
+import {useScrollToTop} from "@react-navigation/native"
 
 const Home = () => {
-    const [searchInput, setSearchInput ] = useState('')
+    const [searchInput, setSearchInput] = useState('');
     const [videos, setVideos] = useState([]);
+    const ref = useRef(null)
+    useScrollToTop(ref)
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).replace(/\//g, '.');
+    };
 
     const handleSearch = () => {
-        if (searchInput.length != 0) {
+        if (searchInput.length !== 0) {
             const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=${encodeURIComponent(searchInput)}&type=video&key=AIzaSyBkR3k72mqHtfIhQbilLTwYLYYIlBJHXoc`;
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     setVideos(data.items);
                 })
                 .catch(error => console.error('Error:', error));
         }
     };
-    return(
+
+    const handleScroll = (event) => {
+        console.log('Scrolled to:', event.nativeEvent.contentOffset.y);
+    };
+
+    return (
         <View style={styles.mainView}>
-            <Text style={styles.Heading}>Videos Show</Text>
+            <Text style={styles.Heading}>Video Showcase</Text>
             <View style={styles.TextInputView}>
-            <TextInput value={searchInput}
-            onChangeText={(val) => setSearchInput(val)}
-            placeholder={"Enter Song title or artist name"}
-            placeholderTextColor={'#000'}
-            style={styles.TextInput}></TextInput>
-            <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-                <Text style={styles.searchButtonText}>Search</Text>
-            </TouchableOpacity>
-        </View>
-        <View style={styles.mainPostView}>
-        <FlatList
+                <TextInput
+                    value={searchInput}
+                    onChangeText={setSearchInput}
+                    placeholder="Enter song title or artist name"
+                    placeholderTextColor="#000"
+                    style={styles.TextInput}
+                />
+                <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+                    <Text style={styles.searchButtonText}>Search</Text>
+                </TouchableOpacity>
+            </View>
+            <FlatList
                 data={videos}
+                ref={ref}
                 keyExtractor={item => item.id.videoId}
-                renderItem={({ item, index }) => (
+                renderItem={({ item }) => (
                     <View style={styles.postView}>
-                        <View style={styles.imageView}>
                         <Image
                             style={styles.thumbnail}
                             source={{ uri: item.snippet.thumbnails.medium.url }}
                         />
-                        <View>
-                            <Text>Name & Title</Text>
-                        </View>
-                        </View>
-                        <View>
-                            <Text>Options</Text>
-                        </View>
+                        <Text style={styles.titleText}>{item.snippet.title}</Text>
+                        <Text style={styles.dateText}>{formatDate(item.snippet.publishedAt)}</Text>
+                        <Text style={styles.channelTitle}>{item.snippet.channelTitle}</Text>
                     </View>
                 )}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}  // Adjust based on your needs for performance
             />
         </View>
-    </View>
-    )
-}
+    );
+};
+
 const styles = StyleSheet.create({
-    mainView:{
+    mainView: {
         flex: 1,
-        alignItems:'center'
+        alignItems: 'center',
+        backgroundColor: '#f0f0f0'
     },
     Heading: {
         fontSize: 32,
-        marginTop: 60,
-        marginLeft: 15,
+        marginTop: 30,
         fontWeight: 'bold'
     },
-    TextInput : {
-        height: 39,
+    TextInput: {
+        height: 40,
         width: '90%',
-        backgroundColor:'#EBEBEB',
-        borderRadius:20,
-        paddingLeft:15,
-        marginTop:20
+        backgroundColor: '#EBEBEB',
+        borderRadius: 20,
+        paddingLeft: 15,
+        marginTop: 10
     },
     TextInputView: {
-        display: 'flex',
-        alignItems: 'center'
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10
     },
-    mainPostView:{
-        width:'90%',
-
+    searchButton: {
+        padding: 10,
+        backgroundColor: '#007AFF',
+        borderRadius: 20,
+        marginLeft: 10
     },
-    postTitle: {
-        width:'100%',
-        display:'flex',
-        justifyContent:'space-between',
-        backgroundColor:'gray',
-        flexDirection:'row'
+    searchButtonText: {
+        color: '#fff'
     },
     postView: {
-        width: '100%',
-        alignItems:'center',
-        marginTop: 20
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        marginVertical: 8,
+        width: '90%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+        elevation: 3
     },
     thumbnail: {
-        backgroundColor: 'rgba(0,0,0,0.06)',
-        width: 50,
-        height: 50,
-        borderRadius: 50
+        width: '100%',
+        height: 200,
+        borderRadius: 10
     },
-    imageView: {
-        display:'flex',
-        flexDirection: 'row',
-    
+    titleText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginTop: 10
+    },
+    dateText: {
+        fontSize: 14,
+        color: '#666'
+    },
+    channelTitle: {
+        fontSize: 15,
+        fontWeight: '500',
+        color: '#000',
+        marginTop: 5
     }
-})
+});
+
 export default Home;
