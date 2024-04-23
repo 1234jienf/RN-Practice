@@ -11,82 +11,61 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { auth } from './Firebase/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import VideoList from './Screens/SignedIn/VideoList';
 
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+function ProfileStack() {
+  return (
+    <Stack.Navigator initialRouteName="Profile">
+      <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+      <Stack.Screen name="VideoListScreen" component={VideoList} options={{ headerShown: false }} />
+    </Stack.Navigator>
+  );
+}
 
 export default function App() {
-  const Stack = createNativeStackNavigator();
-  const [isSignedIn,setIsSignedIn] = useState(false);
-  const Tab = createBottomTabNavigator();
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, user => {
-      console
-      if (user) {
-          setIsSignedIn(true);
-          console.log("User is signed in");
-      } else {
-          setIsSignedIn(false);
-          console.log("No user signed in");
-      }
-  });
+      setIsSignedIn(!!user);
+    });
+    return unsubscribe;
+  }, []);
 
-  // Cleanup subscription on unmount
-  return () => unsubscribe();
-  },[])
-    if(isSignedIn == true){
-      return(
-        <NavigationContainer>
-          <Tab.Navigator
-            screenOptions={({ route }) => ({
-              tabBarIcon: ({ focused, color, size }) => {
-                let iconName;
-    
-                if (route.name === 'Home') {
-                  iconName = focused
-                    ? 'home-variant'
-                    : 'home-variant-outline';
-                } else if (route.name === 'Apparel') {
-                  iconName = focused ? 'format-list-bulleted-square' : 'format-list-checkbox';
-                }
-                else if (route.name === 'Notification') {
-                  iconName = focused ? 'alarm-light' : 'alarm-light-outline';
-                }
-                else {
-                  iconName = focused ? 'account' : 'account-outline';
-                }
-    
-                // You can return any component that you like here!
-                return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
-              },
-              tabBarActiveTintColor: '#2FBBF0',
-              tabBarInactiveTintColor: '#7A8FA6',
-            })}
-          >
-            <Tab.Screen name='Home' component={Home} options={{ headerShown: false }} />
-            <Tab.Screen name='Apparel' component={Apparel} options={{ headerShown: false }} />
-            <Tab.Screen name='Notification' component={Notification} options={{ headerShown: false }} />
-            <Tab.Screen name='Profile' component={Profile} options={{ headerShown: false }} />
-          </Tab.Navigator>
-        </NavigationContainer>
-      )
-    }
-    else
-    {
-      return(
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="signIn">
-            <Stack.Screen 
-                name="signIn" 
-                component={SignIn} 
-                options={{ headerShown: false }} // Set headerShown inside options object
-              />
-              <Stack.Screen 
-                name="signUp" 
-                component={SignUp} 
-                options={{ headerShown: false }} // Set headerShown inside options object if needed
-              />
-          </Stack.Navigator>
-        </NavigationContainer>
-      ) 
-    }
+  return (
+    <NavigationContainer>
+      {isSignedIn ? (
+        <Tab.Navigator
+          screenOptions={({ route }) => ({
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+              switch (route.name) {
+                case 'Home': iconName = focused ? 'home-variant' : 'home-variant-outline'; break;
+                case 'Apparel': iconName = focused ? 'format-list-bulleted-square' : 'format-list-checkbox'; break;
+                case 'Notification': iconName = focused ? 'alarm-light' : 'alarm-light-outline'; break;
+                case 'ProfileStack': iconName = focused ? 'account' : 'account-outline'; break;
+                default: iconName = 'circle';
+              }
+              return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+            },
+            tabBarActiveTintColor: '#2FBBF0',
+            tabBarInactiveTintColor: '#7A8FA6',
+          })}
+        >
+          <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
+          <Tab.Screen name="Apparel" component={Apparel} options={{ headerShown: false }} />
+          <Tab.Screen name="Notification" component={Notification} options={{ headerShown: false }} />
+          <Tab.Screen name="ProfileStack" component={ProfileStack} options={{ headerShown: false, title: 'Profile' }} />
+        </Tab.Navigator>
+      ) : (
+        <Stack.Navigator initialRouteName="signIn">
+          <Stack.Screen name="signIn" component={SignIn} options={{ headerShown: false }} />
+          <Stack.Screen name="signUp" component={SignUp} options={{ headerShown: false }} />
+        </Stack.Navigator>
+      )}
+    </NavigationContainer>
+  );
 }

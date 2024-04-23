@@ -14,6 +14,10 @@ const Profile = ({ navigation, route }) => {
         });
     };
 
+    const goToVideoList = () => {
+      navigation.navigate('VideoListScreen'); 
+    };
+
     return (
         <LinearGradient
             colors={['#0B1238', '#286ECA']}
@@ -53,6 +57,9 @@ const Profile = ({ navigation, route }) => {
                     </Text>
                 </View>
             </View>
+            <TouchableOpacity onPress={goToVideoList}>
+                    <Text style={styles.moreText}>더보기</Text>
+                </TouchableOpacity>
             <ScrollView horizontal={true} style={styles.videoScroll}>
                 <View style={styles.videoContainer}>
                     {/* Example images repeated; replace with actual image sources */}
@@ -181,6 +188,13 @@ const styles = StyleSheet.create({
         borderRadius: 15,  // Smaller border radius
         marginRight: 10  // Space between images
     },
+    moreText: {
+      color: 'white',
+      fontWeight: 'bold',
+      fontSize: 16,
+      marginbottom: -80 ,
+      marginLeft: 300
+  },
 });
 
 export default Profile;
